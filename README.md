@@ -31,3 +31,10 @@ As sudo:
 net.ipv4.ip_forward = 1
 sudo sysctl -p
 ```
+
+## Packet sniffer
+Sniff packages who pass through the device. The output are optimized to show when a password are inserted. Currently, only work in HTTP requests.
+Usage example:
+```bash
+python3 packet_sniffer.py --interface wlp2s0
+```
