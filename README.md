@@ -38,3 +38,11 @@ Usage example:
 ```bash
 python3 packet_sniffer.py --interface wlp2s0
 ```
+
+## DNS Spoffer
+Redirect a webpage when target DNS is visited. Don't forget to be the man in the middle to spoof packages from another devices.
+Usage example:
+```bash
+python3 net_cut.py -t [target_url] -n [new_ip]
+```
+
